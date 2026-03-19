@@ -1,3 +1,10 @@
+import matplotlib.pyplot as plt
+import matplotlib.font_manager as fm
+
+# 한글 폰트 설정 (윈도우 기준)
+plt.rcParams['font.family'] = 'Malgun Gothic'
+plt.rcParams['axes.unicode_minus'] = False
+
 import streamlit as st
 import numpy as np
 import matplotlib.pyplot as plt
