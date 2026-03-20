@@ -152,11 +152,27 @@ hr { border-color: #E2E8F0 !important; margin: 20px 0 !important; }
 
 .app-header {
     background: linear-gradient(135deg, #15803D 0%, #0F5C41 40%, #0369A1 100%);
-    padding: 22px 36px 18px;
-    margin: -1rem -1rem 0;
+    padding: 20px 32px 18px;
+    margin: 0;
+    width: 100%;
+    box-sizing: border-box;
 }
-.app-title { font-size: 23px; font-weight: 900; color: #FFFFFF !important; letter-spacing: -0.5px; }
-.app-sub   { color: rgba(255,255,255,0.80) !important; font-size: 13px; margin-top: 4px; }
+.app-title {
+    font-size: clamp(15px, 2vw, 22px);
+    font-weight: 900;
+    color: #FFFFFF !important;
+    letter-spacing: -0.3px;
+    line-height: 1.3;
+    word-break: keep-all;
+    white-space: normal;
+}
+.app-sub {
+    color: rgba(255,255,255,0.82) !important;
+    font-size: clamp(11px, 1vw, 13px);
+    margin-top: 5px;
+    line-height: 1.5;
+    word-break: keep-all;
+}
 
 .card {
     background: #FFFFFF !important;
@@ -767,10 +783,11 @@ with tab3:
                 xaxis=dict(gridcolor="#F1F5F9", title="가격 (원)",
                            title_font=dict(color="#64748B")),
                 yaxis=dict(gridcolor="#F1F5F9"),
-                margin=dict(l=80, r=70, t=10, b=40),
+                margin=dict(l=80, r=70, t=48, b=40),
                 title=dict(
                     text=f"{usage_sel} · {kind_sel} · {size_for_chart} 가격 비교",
-                    font=dict(color="#374151", size=12),
+                    font=dict(color="#374151", size=13),
+                    x=0, xanchor="left", pad=dict(l=0, t=8),
                 ),
             )
             st.plotly_chart(fig3, use_container_width=True)
@@ -783,7 +800,7 @@ with tab3:
         (price["종량제봉투용도"] == "생활쓰레기") &
         (price["종량제봉투종류"] == "규격봉투") &
         (price["종량제봉투사용대상"] == "가정용")
-    ][["시군구명","10ℓ가격","20ℓ가격","30ℓ가격","50ℓ가격"]].drop_duplicates("시군구명").sort_values("시군구명")
+    ][["시군구명","10ℓ가격","20ℓ가격","30ℓ가격","50ℓ가격"]].drop_duplicates("시군구명").sort_values("시군구명").reset_index(drop=True)
 
     def fmt_price(v):
         if pd.isna(v) or v == 0: return "-"
@@ -793,10 +810,37 @@ with tab3:
     for c in ["10ℓ가격","20ℓ가격","30ℓ가격","50ℓ가격"]:
         disp[c] = disp[c].apply(fmt_price)
     disp.columns = ["자치구","10ℓ","20ℓ","30ℓ","50ℓ"]
-    st.dataframe(disp.set_index("자치구"), use_container_width=True, height=380)
 
-    st.markdown("""
+    # HTML 테이블로 직접 렌더링 — 라이트 모드에서도 확실히 보임
+    rows_html = ""
+    for i, row in disp.iterrows():
+        bg = "#FFFFFF" if i % 2 == 0 else "#F8FAFC"
+        rows_html += f"""
+        <tr style="background:{bg}">
+            <td style="padding:10px 16px;font-weight:600;color:#1E293B;border-bottom:1px solid #F1F5F9">{row['자치구']}</td>
+            <td style="padding:10px 16px;text-align:center;color:#15803D;font-family:'JetBrains Mono',monospace;font-weight:600;border-bottom:1px solid #F1F5F9">{row['10ℓ']}</td>
+            <td style="padding:10px 16px;text-align:center;color:#15803D;font-family:'JetBrains Mono',monospace;font-weight:600;border-bottom:1px solid #F1F5F9">{row['20ℓ']}</td>
+            <td style="padding:10px 16px;text-align:center;color:#15803D;font-family:'JetBrains Mono',monospace;font-weight:600;border-bottom:1px solid #F1F5F9">{row['30ℓ']}</td>
+            <td style="padding:10px 16px;text-align:center;color:#15803D;font-family:'JetBrains Mono',monospace;font-weight:600;border-bottom:1px solid #F1F5F9">{row['50ℓ']}</td>
+        </tr>"""
+
+    st.markdown(f"""
+    <div style="background:#FFFFFF;border:1.5px solid #E2E8F0;border-radius:14px;
+                overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,0.05);">
+        <table style="width:100%;border-collapse:collapse;font-family:'Noto Sans KR',sans-serif;font-size:13px;">
+            <thead>
+                <tr style="background:#F0FDF4;border-bottom:2px solid #BBF7D0">
+                    <th style="padding:12px 16px;text-align:left;color:#15803D;font-weight:700;font-size:12px;letter-spacing:0.5px">자치구</th>
+                    <th style="padding:12px 16px;text-align:center;color:#15803D;font-weight:700;font-size:12px">10ℓ</th>
+                    <th style="padding:12px 16px;text-align:center;color:#15803D;font-weight:700;font-size:12px">20ℓ</th>
+                    <th style="padding:12px 16px;text-align:center;color:#15803D;font-weight:700;font-size:12px">30ℓ</th>
+                    <th style="padding:12px 16px;text-align:center;color:#15803D;font-weight:700;font-size:12px">50ℓ</th>
+                </tr>
+            </thead>
+            <tbody>{rows_html}</tbody>
+        </table>
+    </div>
     <div style="font-size:11px;color:#94A3B8;margin-top:8px">
-        ※ 가정용 규격봉투 기준 / 0원 또는 미표기는 해당 규격 미운영 / 출처: 공공데이터포털
+        ※ 가정용 규격봉투 기준 · 미표기(-)는 해당 규격 미운영 · 출처: 공공데이터포털
     </div>
     """, unsafe_allow_html=True)
