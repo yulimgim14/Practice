@@ -1,75 +1,80 @@
-from flask import Flask, request, jsonify
+import streamlit as st
 import pandas as pd
-import datetime
+from datetime import datetime
 
-app = Flask(__name__)
+# 페이지 설정
+st.set_page_config(page_title="스마트 분리배출 도우미", layout="wide")
 
-# 1. 데이터 로드 (서버 시작 시 메모리에 로드하여 속도 최적화)
+@st.cache_data
+def load_data():
+    # 파일명은 업로드하신 파일명과 정확히 일치해야 합니다.
+    waste = pd.read_csv('생활쓰레기배출정보_서울특별시.csv')
+    price = pd.read_csv('전국종량제봉투가격표준데이터.csv')
+    stats = pd.read_csv('서울시배출량.xlsx - 데이터.csv')
+    return waste, price, stats
+
 try:
-    waste_info = pd.read_csv('생활쓰레기배출정보_서울특별시.csv')
-    price_info = pd.read_csv('전국종량제봉투가격표준데이터.csv')
-    stats_info = pd.read_csv('서울시배출량.xlsx - 데이터.csv')
+    waste_df, price_df, stats_df = load_data()
+
+    st.title("♻️ 스마트 분리배출 도우미")
+    st.markdown("### 우리 동네 쓰레기 배출 정보를 한눈에 확인하세요.")
+
+    # 사이드바: 지역 선택
+    st.sidebar.header("📍 지역 설정")
+    target_gu = st.sidebar.selectbox("자치구를 선택하세요", sorted(waste_df['시군구명'].unique()))
+    
+    dongs = waste_df[waste_df['시군구명'] == target_gu]['관리구역대상지역명'].unique()
+    target_dong = st.sidebar.selectbox("동을 선택하세요", sorted(dongs))
+
+    # 데이터 필터링
+    region_info = waste_df[(waste_df['시군구명'] == target_gu) & (waste_df['관리구역대상지역명'] == target_dong)].iloc[0]
+    
+    # 레이아웃 구성
+    col1, col2, col3 = st.columns(3)
+
+    with col1:
+        st.subheader("⏰ 배출 일정")
+        st.info(f"**일반쓰레기:** {region_info['생활쓰레기배출요일']}")
+        st.info(f"**음식물:** {region_info['음식물쓰레기배출요일']}")
+        st.info(f"**재활용품:** {region_info['재활용품배출요일']}")
+        st.warning(f"🕒 시간: {region_info['생활쓰레기배출시작시각']} ~ {region_info['생활쓰레기배출종료시각']}")
+
+    with col2:
+        st.subheader("💰 봉투 가격 (가정용)")
+        # 서울시 + 해당 구 필터링
+        gu_price = price_df[(price_df['시도명'] == '서울특별시') & (price_df['시군구명'] == target_gu)]
+        
+        n_20 = gu_price[gu_price['종량제봉투용도'] == '생활쓰레기']['20ℓ가격'].max()
+        f_5 = gu_price[gu_price['종량제봉투용도'] == '음식물쓰레기']['5ℓ가격'].max()
+        
+        st.metric("일반 20L", f"{int(n_20) if not pd.isna(n_20) else '확인불가'}원")
+        st.metric("음식물 5L", f"{int(f_5) if not pd.isna(f_5) else '확인불가'}원")
+        st.caption(f"📍 배출장소: {region_info['배출장소유형']}")
+
+    with col3:
+        st.subheader("📊 우리 동네 배출 현황")
+        # 배출량 통계 가공
+        stats_clean = stats_df.copy()
+        # '계' 행 제외 및 수치형 변환
+        stats_clean = stats_clean[stats_clean['자치구별(1)'] != '계']
+        stats_clean['배출량'] = pd.to_numeric(stats_clean['주민 1인당 생활폐기물(쓰레기) 배출량 (㎏/인, 일)'])
+        stats_clean['순위'] = stats_clean['배출량'].rank(ascending=False)
+        
+        my_stat = stats_clean[stats_clean['자치구별(1)'] == target_gu].iloc[0]
+        
+        st.write(f"**{target_gu}**의 1인당 배출량")
+        st.title(f"{my_stat['배출량']}kg")
+        st.write(f"서울시 25개 구 중 **{int(my_stat['순위'])}위**")
+
+    st.divider()
+    
+    # 배출 방법 안내
+    with st.expander("💡 올바른 배출 방법 자세히 보기"):
+        st.write(f"**음식물:** {region_info['음식물쓰레기배출방법']}")
+        st.write(f"**재활용:** {region_info['재활용품배출방법']}")
+        st.write(f"**대형폐기물:** {region_info['일시적다량폐기물배출방법']}")
+        st.write(f"📞 **문의처:** {region_info['관리부서명']} ({region_info['관리부서전화번호']})")
+
 except Exception as e:
-    print(f"데이터 로드 오류: {e}")
-
-@app.route('/api/my-region-info', methods=['GET'])
-def get_region_info():
-    """
-    사용자가 선택한 구/동을 바탕으로 모든 CSV 데이터를 결합하여 응답
-    """
-    gu = request.args.get('gu')  # 예: 종로구
-    dong = request.args.get('dong')  # 예: 무악동
-
-    # --- A. 배출 요일 및 시간 (생활쓰레기배출정보) ---
-    # 동 정보가 없으면 해당 구의 공통 정보를 가져옴
-    region_data = waste_info[(waste_info['시군구명'] == gu) & (waste_info['관리구역대상지역명'].str.contains(dong, na=False))]
-    if region_data.empty:
-        region_data = waste_info[waste_info['시군구명'] == gu].head(1)
-
-    schedule = {
-        "day_normal": region_data['생활쓰레기배출요일'].values[0],
-        "day_food": region_data['음식물쓰레기배출요일'].values[0],
-        "day_recycle": region_data['재활용품배출요일'].values[0],
-        "start_time": region_data['생활쓰레기배출시작시각'].values[0],
-        "end_time": region_data['생활쓰레기배출종료시각'].values[0],
-        "method": region_data['배출장소유형'].values[0],  # 문전수거 등
-        "contact": region_data['관리부서전화번호'].values[0]
-    }
-
-    # --- B. 종량제 봉투 가격 (전국종량제봉투가격표준데이터) ---
-    # 서울특별시 + 해당 구 필터링
-    prices = price_info[(price_info['시도명'] == '서울특별시') & (price_info['시군구명'] == gu)]
-    
-    # 일반 쓰레기 10L, 20L 가격 추출
-    normal_20l = prices[(prices['종량제봉투용도'] == '생활쓰레기') & (prices['종량제봉투사용대상'] == '가정용')]['20ℓ가격'].max()
-    food_5l = prices[(prices['종량제봉투용도'] == '음식물쓰레기')]['5ℓ가격'].max()
-
-    price_summary = {
-        "normal_20l": int(normal_20l) if not pd.isna(normal_20l) else "정보없음",
-        "food_5l": int(food_5l) if not pd.isna(food_5l) else "정보없음"
-    }
-
-    # --- C. 우리 동네 배출 순위 (서울시배출량 데이터) ---
-    # 1인당 배출량 기준으로 정렬하여 순위 계산
-    stats_info['rank'] = stats_info['주민 1인당 생활폐기물(쓰레기) 배출량 (㎏/인, 일)'].rank(ascending=False)
-    my_gu_stats = stats_info[stats_info['자치구별(1)'] == gu]
-    
-    rank_info = {
-        "per_person": my_gu_stats['주민 1인당 생활폐기물(쓰레기) 배출량 (㎏/인, 일)'].values[0],
-        "rank": int(my_gu_stats['rank'].values[0]),
-        "total_gu_count": 25
-    }
-
-    # --- 최종 응답 데이터 구성 ---
-    response = {
-        "region": f"{gu} {dong}",
-        "schedule": schedule,
-        "prices": price_summary,
-        "environment_rank": rank_info,
-        "message": f"오늘 {gu}의 배출 시작 시간은 {schedule['start_time']}입니다!"
-    }
-
-    return jsonify(response)
-
-if __name__ == '__main__':
-    app.run(debug=True, port=5000)
+    st.error(f"데이터 로딩 중 오류가 발생했습니다: {e}")
+    st.write("CSV 파일명들이 코드와 일치하는지 확인해주세요.")
