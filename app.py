@@ -1,158 +1,82 @@
 import streamlit as st
-import numpy as np
 import pandas as pd
 import plotly.express as px
 
-st.set_page_config(page_title="폭염 분석 대시보드", layout="wide")
+# 페이지 설정
+st.set_page_config(page_title="에코-서울: 스마트 분리배출 도우미", layout="wide")
 
-st.title("🔥 폭염 취약성 분석 대시보드")
+# 데이터 로드 (캐싱을 통해 속도 향상)
+@st.cache_data
+def load_data():
+    # 1. 배출 정보 가이드
+    guide_df = pd.read_csv('생활쓰레기배출정보_서울특별시.csv')
+    # 2. 서울시 배출량 통계
+    amount_df = pd.read_csv('서울시배출량.xlsx - 데이터.csv', skiprows=1) # 헤더 처리
+    # 3. 종량제 봉투 가격
+    price_df = pd.read_csv('전국종량제봉투가격표준데이터.csv')
+    return guide_df, amount_df, price_df
 
-# -------------------------
-# 입력
-# -------------------------
-st.sidebar.header("📊 입력 변수")
+guide_df, amount_df, price_df = load_data()
 
-heat_index = st.sidebar.slider("체감온도 (°C)", 25, 45, 35)
-elderly_ratio = st.sidebar.slider("노인 비율 (%)", 0, 50, 20)
-living_alone_ratio = st.sidebar.slider("독거노인 비율 (%)", 0, 50, 15)
-shelter_distance = st.sidebar.slider("쉼터 접근 시간 (분)", 1, 30, 10)
+# 사이드바: 지역 선택
+st.sidebar.header("📍 지역 설정")
+seoul_districts = sorted(guide_df['시군구명'].unique())
+selected_district = st.sidebar.selectbox("거주하시는 '구'를 선택하세요", seoul_districts)
 
-# 지도 크기
-st.sidebar.header("🗺 지도 설정")
-map_size = st.sidebar.slider("지도 크기", 400, 1000, 600)
+# 메인 타이틀
+st.title("♻️ 에코-서울 (Eco-Seoul)")
+st.markdown(f"**30년차 전문가가 알려주는 {selected_district} 맞춤형 배출 가이드**")
 
-# -------------------------
-# 위험도 계산
-# -------------------------
-risk_score = (
-    (heat_index * 0.4) +
-    (elderly_ratio * 0.2) +
-    (living_alone_ratio * 0.2) +
-    (shelter_distance * 0.2)
-)
+# --- Section 1: 실시간 배출 가이드 ---
+st.divider()
+col1, col2 = st.columns(2)
 
-if heat_index >= 35:
-    risk_score *= 1.3
+with col1:
+    st.subheader("📅 배출 일정 & 방법")
+    district_info = guide_df[guide_df['시군구명'] == selected_district].iloc[0]
+    
+    st.info(f"**배출 요일:** {district_info['생활쓰레기배출요일']}")
+    st.warning(f"**배출 시간:** {district_info['생활쓰레기배출시작시각']} ~ {district_info['생활쓰레기배출종료시각']}")
+    st.success(f"**배출 장소:** {district_info['배출장소']} ({district_info['배출장소유형']})")
 
-st.metric("🔥 현재 위험 점수", round(risk_score, 2))
+with col2:
+    st.subheader("💡 올바른 분리배출법")
+    with st.expander("재활용품 버리는 법"):
+        st.write(district_info['재활용품배출방법'])
+    with st.expander("음식물 쓰레기 처리"):
+        st.write(district_info['음식물쓰레기배출방법'])
 
-# -------------------------
-# 가상 지역 데이터
-# -------------------------
-data = pd.DataFrame({
-    "지역": ["서울", "부산", "대구", "인천", "광주", "대전", "울산"],
-    "위도": [37.56, 35.18, 35.87, 37.45, 35.16, 36.35, 35.54],
-    "경도": [126.97, 129.07, 128.60, 126.70, 126.85, 127.38, 129.31],
-    "기온": [34, 32, 36, 33, 35, 34, 35]
-})
+# --- Section 2: 서울시 배출량 현황 시각화 ---
+st.divider()
+st.subheader("📊 서울시 자치구별 배출 성적표")
 
-# -------------------------
-# 탭 구성
-# -------------------------
-tab1, tab2, tab3, tab4 = st.tabs([
-    "🌡 체감온도 분석",
-    "🏠 쉼터 접근성",
-    "👵 취약성 분석",
-    "🗺 지역 지도"
-])
+# 데이터 정리
+amount_df = amount_df[amount_df['자치구별(1)'] != '계']
+# 1인당 배출량 기준으로 정렬
+amount_df = amount_df.sort_values(by='주민 1인당 생활폐기물(쓰레기) 배출량 (㎏/인, 일)', ascending=False)
 
-# =========================
-# 1️⃣ 체감온도 분석
-# =========================
-with tab1:
-    st.subheader("체감온도에 따른 온열질환 위험 변화")
+fig = px.bar(amount_df, 
+             x='자치구별(1)', 
+             y='주민 1인당 생활폐기물(쓰레기) 배출량 (㎏/인, 일)',
+             title="자치구별 1인당 일일 쓰레기 배출량 (kg)",
+             color='주민 1인당 생활폐기물(쓰레기) 배출량 (㎏/인, 일)',
+             color_continuous_scale='Reds')
 
-    temps = np.arange(25, 46)
-    risk_curve = []
+st.plotly_chart(fig, use_container_width=True)
 
-    for t in temps:
-        score = (t * 0.4) + (elderly_ratio * 0.2) + (living_alone_ratio * 0.2) + (shelter_distance * 0.2)
-        if t >= 35:
-            score *= 1.3
-        risk_curve.append(score)
+# 전문가 코멘트
+my_district_rank = amount_df.reset_index().index[amount_df['자치구별(1)'] == selected_district].tolist()[0] + 1
+st.write(f"📢 **전문가 한마디:** {selected_district}는 서울시 25개구 중 배출량 **{my_district_rank}위**입니다. 조금만 더 분리배출에 힘써주세요!")
 
-    df = pd.DataFrame({"체감온도": temps, "위험 점수": risk_curve})
+# --- Section 3: 종량제 봉투 가격 정보 ---
+st.divider()
+st.subheader("💰 우리 동네 봉투 가격")
 
-    fig = px.line(
-        df,
-        x="체감온도",
-        y="위험 점수",
-        title="체감온도와 위험도의 관계 (임계점: 35도)"
-    )
+seoul_prices = price_df[(price_df['시도명'] == '서울특별시') & (price_df['시군구명'] == selected_district)]
+if not seoul_prices.empty:
+    st.dataframe(seoul_prices[['종량제봉투종류', '종량제봉투용도', '10ℓ가격', '20ℓ가격', '50ℓ가격', '100ℓ가격']], use_container_width=True)
+else:
+    st.write("해당 지역의 가격 데이터를 찾을 수 없습니다.")
 
-    st.plotly_chart(fig, use_container_width=True)
-
-# =========================
-# 2️⃣ 쉼터 접근성
-# =========================
-with tab2:
-    st.subheader("쉼터 접근 시간에 따른 위험도 변화")
-
-    distances = np.arange(1, 31)
-    risk_dist = []
-
-    for d in distances:
-        score = (heat_index * 0.4) + (elderly_ratio * 0.2) + (living_alone_ratio * 0.2) + (d * 0.2)
-        if heat_index >= 35:
-            score *= 1.3
-        risk_dist.append(score)
-
-    df = pd.DataFrame({"접근 시간": distances, "위험 점수": risk_dist})
-
-    fig = px.line(
-        df,
-        x="접근 시간",
-        y="위험 점수",
-        title="쉼터 접근성과 위험도의 관계"
-    )
-
-    st.plotly_chart(fig, use_container_width=True)
-
-# =========================
-# 3️⃣ 취약성 분석
-# =========================
-with tab3:
-    st.subheader("취약성 요인별 위험 기여도")
-
-    df = pd.DataFrame({
-        "요인": ["체감온도", "노인 비율", "독거노인 비율", "쉼터 거리"],
-        "기여도": [
-            heat_index * 0.4,
-            elderly_ratio * 0.2,
-            living_alone_ratio * 0.2,
-            shelter_distance * 0.2
-        ]
-    })
-
-    fig = px.bar(
-        df,
-        x="요인",
-        y="기여도",
-        title="요인별 위험 기여도"
-    )
-
-    st.plotly_chart(fig, use_container_width=True)
-
-# =========================
-# 4️⃣ 지도
-# =========================
-with tab4:
-    st.subheader("지역별 온도 지도")
-
-    fig = px.scatter_mapbox(
-        data,
-        lat="위도",
-        lon="경도",
-        size="기온",
-        color="기온",
-        hover_name="지역",
-        zoom=5,
-        height=map_size
-    )
-
-    fig.update_layout(
-        mapbox_style="open-street-map",
-        margin={"r":0,"t":40,"l":0,"b":0}
-    )
-
-    st.plotly_chart(fig, use_container_width=True)
+# 하단 푸터
+st.caption("Data Source: 공공데이터포털, 서울시 열린데이터광장 | 30년차 쓰레기 전문가 자문")
