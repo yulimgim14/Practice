@@ -37,9 +37,11 @@ st.markdown("""
     color: #1E293B !important;
 }
 
-/* 메인 콘텐츠 영역 */
+/* 메인 콘텐츠 영역 — padding-top 건드리지 않음 (Streamlit 툴바 영역 보존) */
 .block-container {
-    padding-top: 0 !important;
+    padding-left: 1rem !important;
+    padding-right: 1rem !important;
+    padding-bottom: 2rem !important;
     background-color: #F4F6F9 !important;
 }
 
@@ -152,13 +154,14 @@ hr { border-color: #E2E8F0 !important; margin: 20px 0 !important; }
 
 .app-header {
     background: linear-gradient(135deg, #15803D 0%, #0F5C41 40%, #0369A1 100%);
-    padding: 20px 32px 18px;
+    padding: 22px 32px 20px;
     margin: 0;
     width: 100%;
     box-sizing: border-box;
+    border-radius: 12px;
 }
 .app-title {
-    font-size: clamp(15px, 2vw, 22px);
+    font-size: 22px;
     font-weight: 900;
     color: #FFFFFF !important;
     letter-spacing: -0.3px;
@@ -168,8 +171,8 @@ hr { border-color: #E2E8F0 !important; margin: 20px 0 !important; }
 }
 .app-sub {
     color: rgba(255,255,255,0.82) !important;
-    font-size: clamp(11px, 1vw, 13px);
-    margin-top: 5px;
+    font-size: 13px;
+    margin-top: 6px;
     line-height: 1.5;
     word-break: keep-all;
 }
@@ -298,10 +301,9 @@ st.markdown("""
   <div class="app-title">♻ 스마트 분리배출 도우미</div>
   <div class="app-sub">서울시 25개 자치구 · 생활쓰레기 배출 정보 · 배출량 히트맵 · 종량제 봉투 가격 통합 플랫폼</div>
 </div>
-<div style="height:1px;background:#E8ECF0;margin-bottom:0"></div>
 """, unsafe_allow_html=True)
 
-st.markdown("<div style='height:16px'></div>", unsafe_allow_html=True)
+st.markdown("<div style='height:8px'></div>", unsafe_allow_html=True)
 
 
 # ════════════════════════════════════════════════════════
