@@ -1,6 +1,4 @@
 streamlit
-plotly
-openpyxl
+pandas
 folium
 streamlit-folium
-numpy
