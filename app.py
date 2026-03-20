@@ -18,227 +18,214 @@ st.set_page_config(
 )
 
 # ════════════════════════════════════════════════════════
-#  전역 스타일
+#  전역 스타일  (라이트 테마 · 고가독성)
 # ════════════════════════════════════════════════════════
 st.markdown("""
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&family=JetBrains+Mono:wght@400;600&display=swap');
 
-*, html, body { font-family: 'Noto Sans KR', sans-serif; }
+/* ══ 폰트 전역 ══ */
+*, html, body, [class*="css"] { font-family: 'Noto Sans KR', sans-serif !important; }
 
-/* ── 앱 배경 */
-.stApp { background: #080C10; }
+/* ══ 전체 앱 배경 & 기본 텍스트 — 다크모드 덮어쓰기 ══ */
+.stApp,
+.stApp > div,
+[data-testid="stAppViewContainer"],
+[data-testid="stAppViewBlockContainer"],
+[data-testid="stVerticalBlock"] {
+    background-color: #F4F6F9 !important;
+    color: #1E293B !important;
+}
 
-/* ── 탭 */
+/* 메인 콘텐츠 영역 */
+.block-container {
+    padding-top: 0 !important;
+    background-color: #F4F6F9 !important;
+}
+
+/* 기본 p, span, div 텍스트 */
+p, span, div, label, li {
+    color: #1E293B;
+}
+
+/* ══ 탭 ══ */
 .stTabs [data-baseweb="tab-list"] {
-    background: #0D1117;
-    border-bottom: 1px solid #1C2333;
-    gap: 0;
-    padding: 0 24px;
+    background: #FFFFFF !important;
+    border-bottom: 2px solid #E2E8F0 !important;
+    padding: 0 28px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.07);
 }
 .stTabs [data-baseweb="tab"] {
-    color: #5B6476;
-    font-size: 13px;
-    font-weight: 500;
-    padding: 14px 24px;
-    border-bottom: 2px solid transparent;
-    border-radius: 0;
-    letter-spacing: 0.3px;
-}
-.stTabs [aria-selected="true"] {
-    color: #3DEFA0 !important;
-    border-bottom: 2px solid #3DEFA0 !important;
+    color: #94A3B8 !important;
+    font-size: 14px !important;
+    font-weight: 500 !important;
+    padding: 14px 28px !important;
+    border-bottom: 3px solid transparent !important;
+    border-radius: 0 !important;
     background: transparent !important;
 }
-.stTabs [data-baseweb="tab-panel"] { padding: 0; }
-
-/* ── 셀렉트박스 */
-[data-testid="stSelectbox"] > div > div {
-    background: #0D1117;
-    border: 1px solid #1C2333;
-    border-radius: 8px;
-    color: #C9D1D9;
+.stTabs [aria-selected="true"] {
+    color: #166534 !important;
+    border-bottom: 3px solid #16A34A !important;
+    font-weight: 700 !important;
+}
+.stTabs [data-baseweb="tab-panel"] {
+    background-color: #F4F6F9 !important;
+    padding: 0 !important;
 }
 
-/* ── 메트릭 */
+/* ══ 셀렉트박스 ══ */
+[data-testid="stSelectbox"] > div > div {
+    background: #FFFFFF !important;
+    border: 1.5px solid #CBD5E1 !important;
+    border-radius: 10px !important;
+    color: #1E293B !important;
+    font-size: 14px !important;
+}
+[data-testid="stSelectbox"] span,
+[data-testid="stSelectbox"] p {
+    color: #1E293B !important;
+}
+
+/* ══ 라디오 ══ */
+[data-testid="stRadio"] label,
+[data-testid="stRadio"] p,
+[data-testid="stRadio"] span {
+    color: #374151 !important;
+    font-size: 13px !important;
+    font-weight: 500 !important;
+}
+
+/* ══ 메트릭 카드 ══ */
 [data-testid="metric-container"] {
-    background: #0D1117;
-    border: 1px solid #1C2333;
-    border-radius: 12px;
-    padding: 18px 20px;
+    background: #FFFFFF !important;
+    border: 1.5px solid #E2E8F0 !important;
+    border-radius: 14px !important;
+    padding: 18px 20px !important;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06) !important;
 }
 [data-testid="stMetricValue"] {
-    color: #3DEFA0 !important;
+    color: #15803D !important;
     font-family: 'JetBrains Mono', monospace !important;
     font-size: 26px !important;
+    font-weight: 700 !important;
 }
-[data-testid="stMetricLabel"] { color: #5B6476 !important; font-size: 11px !important; }
-[data-testid="stMetricDelta"] { color: #58A6FF !important; }
+[data-testid="stMetricLabel"] {
+    color: #64748B !important;
+    font-size: 12px !important;
+    font-weight: 600 !important;
+}
+[data-testid="stMetricDelta"] {
+    color: #2563EB !important;
+    font-size: 12px !important;
+}
 
-/* ── 데이터프레임 */
-[data-testid="stDataFrame"] { border: 1px solid #1C2333 !important; border-radius: 10px; }
+/* ══ 데이터프레임 ══ */
+[data-testid="stDataFrame"] {
+    border: 1.5px solid #E2E8F0 !important;
+    border-radius: 12px !important;
+    background: #FFFFFF !important;
+}
+[data-testid="stDataFrame"] * {
+    color: #1E293B !important;
+    background-color: #FFFFFF !important;
+}
 
-/* ── hr */
-hr { border-color: #1C2333 !important; margin: 20px 0 !important; }
+/* ══ hr ══ */
+hr { border-color: #E2E8F0 !important; margin: 20px 0 !important; }
 
-/* ── 라디오 */
-[data-testid="stRadio"] label { color: #8B949E !important; font-size: 13px; }
-[data-testid="stRadio"] [data-testid="stMarkdownContainer"] p { color: #8B949E !important; }
-
-/* ── 버튼 */
+/* ══ 버튼 ══ */
 .stButton > button {
-    background: #0D1117 !important;
-    color: #3DEFA0 !important;
-    border: 1px solid #2A4A3A !important;
-    border-radius: 8px !important;
-    font-weight: 500 !important;
+    background: #FFFFFF !important;
+    color: #15803D !important;
+    border: 1.5px solid #86EFAC !important;
+    border-radius: 10px !important;
+    font-weight: 600 !important;
     font-size: 13px !important;
-    transition: all 0.2s !important;
 }
 .stButton > button:hover {
-    background: #162A20 !important;
-    border-color: #3DEFA0 !important;
+    background: #F0FDF4 !important;
+    border-color: #16A34A !important;
 }
 
-/* ── 검색창 */
-[data-testid="stTextInput"] input {
-    background: #0D1117 !important;
-    border: 1px solid #1C2333 !important;
-    color: #C9D1D9 !important;
-    border-radius: 8px !important;
-}
-[data-testid="stTextInput"] input:focus {
-    border-color: #3DEFA0 !important;
-    box-shadow: 0 0 0 2px rgba(61,239,160,0.15) !important;
-}
+/* ══ 커스텀 컴포넌트 ══ */
 
-/* ── 커스텀 컴포넌트 */
 .app-header {
-    background: linear-gradient(135deg, #0D1117 0%, #0A1628 50%, #081A12 100%);
-    border-bottom: 1px solid #1C2333;
-    padding: 20px 32px 16px;
+    background: linear-gradient(135deg, #15803D 0%, #0F5C41 40%, #0369A1 100%);
+    padding: 22px 36px 18px;
     margin: -1rem -1rem 0;
 }
-.app-title {
-    font-size: 22px;
-    font-weight: 900;
-    letter-spacing: -0.5px;
-    background: linear-gradient(90deg, #3DEFA0, #58D9A0, #58A6FF);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    display: inline-block;
-}
-.app-sub { color: #5B6476; font-size: 12px; margin-top: 2px; }
+.app-title { font-size: 23px; font-weight: 900; color: #FFFFFF !important; letter-spacing: -0.5px; }
+.app-sub   { color: rgba(255,255,255,0.80) !important; font-size: 13px; margin-top: 4px; }
 
 .card {
-    background: #0D1117;
-    border: 1px solid #1C2333;
-    border-radius: 12px;
+    background: #FFFFFF !important;
+    border: 1.5px solid #E2E8F0;
+    border-radius: 14px;
     padding: 18px 20px;
     margin-bottom: 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
 }
 .card-title {
-    font-size: 11px;
-    font-weight: 600;
-    color: #5B6476;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    margin-bottom: 8px;
+    font-size: 11px; font-weight: 700; color: #94A3B8 !important;
+    text-transform: uppercase; letter-spacing: 1.2px; margin-bottom: 8px;
 }
-.card-value {
-    font-size: 28px;
-    font-weight: 700;
-    font-family: 'JetBrains Mono', monospace;
-    color: #3DEFA0;
-}
-.card-sub { font-size: 12px; color: #5B6476; margin-top: 4px; }
 
 .info-pill {
-    display: inline-block;
-    padding: 4px 12px;
-    border-radius: 20px;
-    font-size: 11px;
-    font-weight: 600;
-    margin: 2px;
+    display: inline-block; padding: 4px 13px; border-radius: 20px;
+    font-size: 12px; font-weight: 600; margin: 2px;
 }
-.pill-green { background: #102A1C; color: #3DEFA0; border: 1px solid #1E5A38; }
-.pill-blue  { background: #0D2040; color: #58A6FF; border: 1px solid #1A3A70; }
-.pill-amber { background: #2A1A08; color: #F0B429; border: 1px solid #5A3810; }
-.pill-red   { background: #2A0D0D; color: #F87171; border: 1px solid #5A1A1A; }
-.pill-gray  { background: #161B22; color: #8B949E; border: 1px solid #1C2333; }
+.pill-green { background: #DCFCE7 !important; color: #15803D !important; border: 1.5px solid #86EFAC; }
+.pill-blue  { background: #DBEAFE !important; color: #1D4ED8 !important; border: 1.5px solid #93C5FD; }
+.pill-amber { background: #FEF3C7 !important; color: #92400E !important; border: 1.5px solid #FCD34D; }
+.pill-red   { background: #FEE2E2 !important; color: #991B1B !important; border: 1.5px solid #FCA5A5; }
+.pill-gray  { background: #F1F5F9 !important; color: #475569 !important; border: 1.5px solid #CBD5E1; }
 
 .day-dot {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 32px; height: 32px;
-    border-radius: 50%;
-    font-size: 11px;
-    font-weight: 700;
-    margin: 2px;
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 32px; height: 32px; border-radius: 50%;
+    font-size: 12px; font-weight: 700; margin: 2px;
 }
-.dot-on  { background: #1E5A38; color: #3DEFA0; border: 1.5px solid #3DEFA0; }
-.dot-off { background: #0D1117; color: #2A3040; border: 1.5px solid #1C2333; }
+.dot-on  { background: #16A34A !important; color: #FFFFFF !important; box-shadow: 0 2px 6px rgba(22,163,74,0.4); }
+.dot-off { background: #F1F5F9 !important; color: #94A3B8 !important; border: 1.5px solid #E2E8F0; }
 
 .section-label {
-    font-size: 10px;
-    font-weight: 700;
-    color: #3B4455;
-    text-transform: uppercase;
-    letter-spacing: 1.5px;
-    margin: 20px 0 10px;
+    font-size: 11px; font-weight: 700; color: #94A3B8 !important;
+    text-transform: uppercase; letter-spacing: 1.4px; margin: 20px 0 10px;
+    display: block;
 }
 
 .price-cell {
-    background: #0D1117;
-    border: 1px solid #1C2333;
-    border-radius: 8px;
-    padding: 10px;
-    text-align: center;
+    background: #F8FAFC !important;
+    border: 1.5px solid #E2E8F0; border-radius: 10px;
+    padding: 12px 8px; text-align: center;
 }
-.price-size { font-size: 10px; color: #5B6476; margin-bottom: 4px; }
-.price-val  { font-size: 17px; font-weight: 700; color: #3DEFA0; font-family: 'JetBrains Mono', monospace; }
-.price-won  { font-size: 10px; color: #5B6476; }
+.price-size { font-size: 11px; color: #64748B !important; font-weight: 600; margin-bottom: 5px; }
+.price-val  { font-size: 18px; font-weight: 700; color: #15803D !important; font-family: 'JetBrains Mono', monospace; }
+.price-won  { font-size: 11px; color: #94A3B8 !important; margin-top: 1px; }
 
 .countdown-box {
-    background: linear-gradient(135deg, #0A1A12, #0D2018);
-    border: 1px solid #1E5A38;
-    border-radius: 12px;
-    padding: 16px 20px;
-    text-align: center;
+    background: linear-gradient(135deg, #F0FDF4, #EFF6FF) !important;
+    border: 1.5px solid #86EFAC; border-radius: 14px;
+    padding: 16px 20px; text-align: center;
 }
-.countdown-label { font-size: 11px; color: #5B6476; margin-bottom: 6px; }
-.countdown-time  { font-size: 32px; font-weight: 900; color: #3DEFA0; font-family: 'JetBrains Mono', monospace; letter-spacing: 2px; }
-.countdown-note  { font-size: 11px; color: #3DEFA0; opacity: 0.6; margin-top: 4px; }
-
-.heatmap-legend {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    font-size: 11px;
-    color: #5B6476;
-    margin-top: 8px;
+.countdown-label { font-size: 11px; color: #64748B !important; font-weight: 600; margin-bottom: 6px; }
+.countdown-time  {
+    font-size: 30px; font-weight: 900; color: #15803D !important;
+    font-family: 'JetBrains Mono', monospace; letter-spacing: 3px;
 }
-.legend-bar {
-    width: 140px; height: 8px;
-    border-radius: 4px;
-    background: linear-gradient(90deg, #3DEFA0, #F0B429, #F87171);
-}
+.countdown-note { font-size: 12px; color: #16A34A !important; margin-top: 5px; }
 
 .rank-row {
-    display: flex;
-    align-items: center;
-    padding: 8px 12px;
-    border-radius: 8px;
-    margin: 3px 0;
-    font-size: 13px;
+    display: flex; align-items: center;
+    padding: 8px 10px; border-radius: 8px; margin: 2px 0; font-size: 13px;
 }
-.rank-row:hover { background: #0D1117; }
-.rank-num { width: 28px; font-size: 11px; color: #3B4455; font-family: 'JetBrains Mono', monospace; }
-.rank-gu  { flex: 1; color: #C9D1D9; }
-.rank-bar-wrap { width: 120px; height: 6px; background: #1C2333; border-radius: 3px; margin: 0 10px; }
-.rank-bar { height: 100%; border-radius: 3px; }
-.rank-val { width: 60px; text-align: right; color: #3DEFA0; font-family: 'JetBrains Mono', monospace; font-size: 12px; }
+.rank-row:hover { background: #F0FDF4 !important; }
+.rank-num { width: 28px; font-size: 11px; color: #CBD5E1 !important; font-family: 'JetBrains Mono', monospace; font-weight: 600; }
+.rank-gu  { flex: 1; color: #1E293B !important; font-weight: 500; }
+.rank-bar-wrap { width: 110px; height: 7px; background: #E2E8F0; border-radius: 4px; margin: 0 10px; }
+.rank-bar { height: 100%; border-radius: 4px; }
+.rank-val { width: 56px; text-align: right; color: #15803D !important; font-family: 'JetBrains Mono', monospace; font-size: 12px; font-weight: 700; }
 </style>
 """, unsafe_allow_html=True)
 
@@ -295,6 +282,7 @@ st.markdown("""
   <div class="app-title">♻ 스마트 분리배출 도우미</div>
   <div class="app-sub">서울시 25개 자치구 · 생활쓰레기 배출 정보 · 배출량 히트맵 · 종량제 봉투 가격 통합 플랫폼</div>
 </div>
+<div style="height:1px;background:#E8ECF0;margin-bottom:0"></div>
 """, unsafe_allow_html=True)
 
 st.markdown("<div style='height:16px'></div>", unsafe_allow_html=True)
@@ -363,7 +351,7 @@ with tab1:
                 """, unsafe_allow_html=True)
         except Exception:
             with kc4:
-                st.markdown(f'<div class="card"><div class="card-title">배출 시간</div><div style="color:#3DEFA0;font-size:16px">{start_str} ~ {end_str}</div></div>', unsafe_allow_html=True)
+                st.markdown(f'<div class="card"><div class="card-title">배출 시간</div><div style="color:#15803D;font-size:16px;font-weight:700">{start_str} ~ {end_str}</div></div>', unsafe_allow_html=True)
 
     st.markdown("<div style='height:4px'></div>", unsafe_allow_html=True)
     st.markdown("---")
@@ -382,7 +370,7 @@ with tab1:
             f"&z=14&output=embed&hl=ko"
         )
         st.markdown(f"""
-        <div style="border-radius:12px;overflow:hidden;border:1px solid #1C2333;">
+        <div style="border-radius:14px;overflow:hidden;border:1.5px solid #E8ECF0;box-shadow:0 4px 16px rgba(0,0,0,0.08)">
             <iframe
                 width="100%" height="420"
                 src="{google_maps_url}"
@@ -393,7 +381,7 @@ with tab1:
                 style="display:block">
             </iframe>
         </div>
-        <div style="font-size:11px;color:#3B4455;margin-top:6px;text-align:right">
+        <div style="font-size:11px;color:#8A94A6;margin-top:6px;text-align:right">
             📍 {gu} 중심 좌표 기준 · Google Maps
         </div>
         """, unsafe_allow_html=True)
@@ -413,7 +401,7 @@ with tab1:
             <div class="card">
                 <div class="card-title">배출 장소</div>
                 <span class="info-pill {pill_cls}">{btype}</span>
-                <div style="color:#8B949E;font-size:12px;margin-top:8px">{bplace}</div>
+                <div style="color:#4B5563;font-size:13px;margin-top:8px;font-weight:500">{bplace}</div>
             </div>
             """, unsafe_allow_html=True)
 
@@ -435,24 +423,25 @@ with tab1:
                 ])
                 st.markdown(f"""
                 <div style="margin-bottom:10px">
-                    <div style="font-size:11px;color:#5B6476;margin-bottom:4px">{cat_label}</div>
+                    <div style="font-size:12px;color:#6B7A90;margin-bottom:4px;font-weight:600">{cat_label}</div>
                     <div>{dots}</div>
                 </div>
                 """, unsafe_allow_html=True)
 
             # 배출 방법 3종
             for method_label, method_col, color in [
-                ("🗑 일반쓰레기 배출방법", "생활쓰레기배출방법", "#F0B429"),
-                ("♻️ 재활용 배출방법",   "재활용품배출방법",   "#58A6FF"),
-                ("🥡 음식물 배출방법",   "음식물쓰레기배출방법","#3DEFA0"),
+                ("🗑 일반쓰레기 배출방법", "생활쓰레기배출방법", "#D97706"),
+                ("♻️ 재활용 배출방법",   "재활용품배출방법",   "#2563EB"),
+                ("🥡 음식물 배출방법",   "음식물쓰레기배출방법","#1A7F5A"),
             ]:
                 val = r.get(method_col, "")
                 if pd.notna(val) and str(val).strip():
                     st.markdown(f"""
-                    <div style="background:#0D1117;border-left:3px solid {color};
-                                border-radius:0 8px 8px 0;padding:10px 14px;margin:6px 0">
-                        <div style="font-size:10px;color:#5B6476;margin-bottom:3px">{method_label}</div>
-                        <div style="font-size:12px;color:#C9D1D9;line-height:1.5">{str(val).strip()}</div>
+                    <div style="background:#F8FAFB;border-left:3px solid {color};
+                                border-radius:0 10px 10px 0;padding:11px 14px;margin:6px 0;
+                                border-top:1px solid #E8ECF0;border-right:1px solid #E8ECF0;border-bottom:1px solid #E8ECF0">
+                        <div style="font-size:10px;color:#8A94A6;margin-bottom:4px;font-weight:700;text-transform:uppercase;letter-spacing:0.8px">{method_label}</div>
+                        <div style="font-size:13px;color:#1E2532;line-height:1.6;font-weight:400">{str(val).strip()}</div>
                     </div>
                     """, unsafe_allow_html=True)
 
@@ -461,12 +450,12 @@ with tab1:
             tel  = r.get("관리부서전화번호","")
             if pd.notna(dept) and str(dept).strip():
                 st.markdown(f"""
-                <div style="background:#0D1117;border:1px solid #1C2333;border-radius:8px;
-                            padding:10px 14px;margin-top:10px;display:flex;gap:12px;align-items:center">
-                    <span style="font-size:16px">📞</span>
+                <div style="background:#F0FAF5;border:1.5px solid #A8D5C2;border-radius:10px;
+                            padding:12px 16px;margin-top:12px;display:flex;gap:12px;align-items:center">
+                    <span style="font-size:20px">📞</span>
                     <div>
-                        <div style="font-size:12px;color:#C9D1D9">{dept}</div>
-                        <div style="font-size:13px;color:#3DEFA0;font-family:'JetBrains Mono',monospace">{tel}</div>
+                        <div style="font-size:12px;color:#4B5563;font-weight:500">{dept}</div>
+                        <div style="font-size:15px;color:#1A7F5A;font-family:'JetBrains Mono',monospace;font-weight:700;margin-top:2px">{tel}</div>
                     </div>
                 </div>
                 """, unsafe_allow_html=True)
@@ -515,7 +504,7 @@ with tab2:
 
         m = folium.Map(
             location=[37.5665, 126.9780], zoom_start=11,
-            tiles="CartoDB dark_matter",
+            tiles="CartoDB positron",
         )
 
         col_key = "1인당" if "1인당" in map_mode else "총량"
@@ -547,21 +536,23 @@ with tab2:
                 xl.sort_values(col_key, ascending=False).reset_index(drop=True)["구"] == gname][0]) + 1
 
             popup_html = f"""
-            <div style="background:#0D1117;color:#C9D1D9;padding:12px;border-radius:8px;
-                        border:1px solid #1C2333;font-family:sans-serif;min-width:160px">
-                <b style="color:#3DEFA0;font-size:15px">{gname}</b>
+            <div style="background:#FFFFFF;color:#1E293B;padding:12px;border-radius:10px;
+                        border:1.5px solid #E2E8F0;font-family:sans-serif;min-width:160px;
+                        box-shadow:0 4px 12px rgba(0,0,0,0.12)">
+                <b style="color:#15803D;font-size:15px">{gname}</b>
                 <div style="margin-top:6px;font-size:12px">
-                    <span style="color:#5B6476">1인당: </span>
-                    <b style="color:#F0B429">{row['1인당']:.2f} ㎏/일</b>
+                    <span style="color:#64748B">1인당: </span>
+                    <b style="color:#D97706">{row['1인당']:.2f} ㎏/일</b>
                 </div>
                 <div style="font-size:12px">
-                    <span style="color:#5B6476">총량: </span>
-                    <b style="color:#58A6FF">{row['총량']:,.0f} 톤/일</b>
+                    <span style="color:#64748B">총량: </span>
+                    <b style="color:#2563EB">{row['총량']:,.0f} 톤/일</b>
                 </div>
                 <div style="font-size:12px">
-                    <span style="color:#5B6476">인구: </span>{row['인구']:,.0f}명
+                    <span style="color:#64748B">인구: </span>
+                    <b style="color:#374151">{row['인구']:,.0f}명</b>
                 </div>
-                <div style="font-size:11px;color:#5B6476;margin-top:4px">서울시 {rank_n}위</div>
+                <div style="font-size:11px;color:#94A3B8;margin-top:4px">서울시 {rank_n}위</div>
             </div>
             """
             folium.CircleMarker(
@@ -576,13 +567,13 @@ with tab2:
         # 범례
         legend = """
         <div style="position:fixed;bottom:24px;right:24px;z-index:9999;
-                    background:#0D1117;border:1px solid #1C2333;border-radius:10px;
-                    padding:12px 16px;font-family:sans-serif">
-            <div style="color:#C9D1D9;font-size:11px;font-weight:700;margin-bottom:8px">배출량</div>
-            <div style="display:flex;align-items:center;gap:6px;font-size:10px;color:#8B949E">
-                <span style="color:#3DEFA0">●</span> 낮음
-                <div style="width:80px;height:6px;background:linear-gradient(90deg,#3DEFA0,#F0B429,#F87171);border-radius:3px"></div>
-                <span style="color:#F87171">●</span> 높음
+                    background:#FFFFFF;border:1.5px solid #E2E8F0;border-radius:10px;
+                    padding:12px 16px;font-family:sans-serif;box-shadow:0 4px 12px rgba(0,0,0,0.12)">
+            <div style="color:#1E293B;font-size:11px;font-weight:700;margin-bottom:8px">배출량 수준</div>
+            <div style="display:flex;align-items:center;gap:6px;font-size:10px;color:#64748B">
+                <span style="color:#16A34A;font-weight:bold">●</span> 낮음
+                <div style="width:80px;height:6px;background:linear-gradient(90deg,#16A34A,#F59E0B,#EF4444);border-radius:3px"></div>
+                <span style="color:#EF4444;font-weight:bold">●</span> 높음
             </div>
         </div>
         """
@@ -600,7 +591,7 @@ with tab2:
             ratio = row["1인당"] / max_v
             if ratio > 0.7:   bar_c = "#F87171"
             elif ratio > 0.4: bar_c = "#F0B429"
-            else:             bar_c = "#3DEFA0"
+            else:             bar_c = "#16A34A"
             bar_w = int(ratio * 100)
             st.markdown(f"""
             <div class="rank-row">
@@ -620,17 +611,17 @@ with tab2:
         fig = go.Figure(go.Bar(
             x=top10["총량"], y=top10["구"], orientation="h",
             marker=dict(color=top10["총량"],
-                        colorscale=[[0,"#1A2F1C"],[0.5,"#2A6449"],[1,"#3DEFA0"]]),
+                        colorscale=[[0,"#D1FAE5"],[0.5,"#34D399"],[1,"#059669"]]),
             text=top10["총량"].apply(lambda v: f"{v:,.0f}t"),
-            textposition="outside", textfont=dict(size=10, color="#8B949E"),
+            textposition="outside", textfont=dict(size=10, color="#374151"),
         ))
         fig.update_layout(
             height=280, showlegend=False,
-            plot_bgcolor="#080C10", paper_bgcolor="#080C10",
-            font=dict(family="Noto Sans KR", color="#8B949E", size=11),
-            xaxis=dict(gridcolor="#1C2333", showgrid=True, title="톤/일",
-                       title_font=dict(color="#5B6476")),
-            yaxis=dict(gridcolor="#1C2333"),
+            plot_bgcolor="#FFFFFF", paper_bgcolor="#FFFFFF",
+            font=dict(family="Noto Sans KR", color="#374151", size=11),
+            xaxis=dict(gridcolor="#F1F5F9", showgrid=True, title="톤/일",
+                       title_font=dict(color="#64748B")),
+            yaxis=dict(gridcolor="#F1F5F9"),
             margin=dict(l=70, r=60, t=10, b=30),
         )
         st.plotly_chart(fig, use_container_width=True)
@@ -645,23 +636,23 @@ with tab2:
         marker=dict(
             size=xl["1인당"] / xl["1인당"].max() * 50 + 12,
             color=xl["1인당"],
-            colorscale=[[0,"#1A2F1C"],[0.4,"#2A6449"],[0.7,"#F0B429"],[1,"#F87171"]],
+            colorscale=[[0,"#D1FAE5"],[0.4,"#34D399"],[0.7,"#F59E0B"],[1,"#EF4444"]],
             showscale=True,
             colorbar=dict(title="1인당(㎏)", thickness=10,
-                          tickfont=dict(color="#5B6476", size=10),
-                          title_font=dict(color="#5B6476", size=10)),
-            line=dict(color="#1C2333", width=1),
+                          tickfont=dict(color="#64748B", size=10),
+                          title_font=dict(color="#64748B", size=10)),
+            line=dict(color="#FFFFFF", width=1.5),
         ),
         text=xl["구"], textposition="top center",
-        textfont=dict(size=9, color="#8B949E"),
+        textfont=dict(size=9, color="#475569"),
         hovertemplate="<b>%{text}</b><br>인구: %{x:,}명<br>총량: %{y:,.0f}t/일<extra></extra>",
     ))
     fig2.update_layout(
         height=340,
-        plot_bgcolor="#080C10", paper_bgcolor="#080C10",
-        font=dict(family="Noto Sans KR", color="#8B949E", size=11),
-        xaxis=dict(gridcolor="#1C2333", title="인구 (명)", title_font=dict(color="#5B6476")),
-        yaxis=dict(gridcolor="#1C2333", title="총 배출량 (톤/일)", title_font=dict(color="#5B6476")),
+        plot_bgcolor="#FFFFFF", paper_bgcolor="#FFFFFF",
+        font=dict(family="Noto Sans KR", color="#374151", size=11),
+        xaxis=dict(gridcolor="#F1F5F9", title="인구 (명)", title_font=dict(color="#64748B")),
+        yaxis=dict(gridcolor="#F1F5F9", title="총 배출량 (톤/일)", title_font=dict(color="#64748B")),
         margin=dict(l=60, r=60, t=20, b=40),
     )
     st.plotly_chart(fig2, use_container_width=True)
@@ -698,7 +689,7 @@ with tab3:
         ]
 
         if gu_price.empty:
-            st.markdown('<div class="card"><div style="color:#5B6476;font-size:13px">해당 조건의 가격 데이터가 없습니다.</div></div>', unsafe_allow_html=True)
+            st.markdown('<div class="card"><div style="color:#64748B;font-size:13px">해당 조건의 가격 데이터가 없습니다.</div></div>', unsafe_allow_html=True)
         else:
             for _, pr in gu_price.iterrows():
                 target = pr.get("종량제봉투사용대상", "")
@@ -732,10 +723,10 @@ with tab3:
         # 음식물 추가 안내
         if usage_sel == "음식물쓰레기":
             st.markdown("""
-            <div style="background:#0A1628;border:1px solid #1A3A70;border-radius:8px;
-                        padding:12px;margin-top:8px;font-size:12px;color:#8B949E">
-                💧 <b style="color:#58A6FF">음식물 봉투 팁</b><br>
-                물기를 최대한 제거 후 배출하면 봉투 파손 방지 및<br>
+            <div style="background:#EFF6FF;border:1.5px solid #93C5FD;border-radius:10px;
+                        padding:12px 16px;margin-top:8px;font-size:13px;color:#1E40AF;line-height:1.6">
+                💧 <b>음식물 봉투 팁</b><br>
+                물기를 최대한 제거 후 배출하면 봉투 파손 방지 및
                 수거 효율 향상에 도움이 됩니다.
             </div>
             """, unsafe_allow_html=True)
@@ -758,7 +749,7 @@ with tab3:
         if compare_df.empty:
             st.info("해당 조건의 비교 데이터가 없습니다.")
         else:
-            bar_colors = ["#3DEFA0" if g == search_gu else "#1E3A2A"
+            bar_colors = ["#059669" if g == search_gu else "#A7F3D0"
                           for g in compare_df["시군구명"]]
             fig3 = go.Figure(go.Bar(
                 x=compare_df[size_col_name], y=compare_df["시군구명"],
@@ -766,20 +757,20 @@ with tab3:
                 marker_color=bar_colors,
                 text=compare_df[size_col_name].apply(lambda v: f"{int(v)}원"),
                 textposition="outside",
-                textfont=dict(size=10, color="#8B949E"),
+                textfont=dict(size=10, color="#374151"),
             ))
             fig3.update_layout(
                 height=max(300, len(compare_df) * 26),
                 showlegend=False,
-                plot_bgcolor="#080C10", paper_bgcolor="#080C10",
-                font=dict(family="Noto Sans KR", color="#8B949E", size=11),
-                xaxis=dict(gridcolor="#1C2333", title="가격 (원)",
-                           title_font=dict(color="#5B6476")),
-                yaxis=dict(gridcolor="#1C2333"),
+                plot_bgcolor="#FFFFFF", paper_bgcolor="#FFFFFF",
+                font=dict(family="Noto Sans KR", color="#374151", size=11),
+                xaxis=dict(gridcolor="#F1F5F9", title="가격 (원)",
+                           title_font=dict(color="#64748B")),
+                yaxis=dict(gridcolor="#F1F5F9"),
                 margin=dict(l=80, r=70, t=10, b=40),
                 title=dict(
                     text=f"{usage_sel} · {kind_sel} · {size_for_chart} 가격 비교",
-                    font=dict(color="#5B6476", size=12),
+                    font=dict(color="#374151", size=12),
                 ),
             )
             st.plotly_chart(fig3, use_container_width=True)
@@ -805,7 +796,7 @@ with tab3:
     st.dataframe(disp.set_index("자치구"), use_container_width=True, height=380)
 
     st.markdown("""
-    <div style="font-size:11px;color:#3B4455;margin-top:8px">
+    <div style="font-size:11px;color:#94A3B8;margin-top:8px">
         ※ 가정용 규격봉투 기준 / 0원 또는 미표기는 해당 규격 미운영 / 출처: 공공데이터포털
     </div>
     """, unsafe_allow_html=True)
